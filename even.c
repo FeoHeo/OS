@@ -26,7 +26,7 @@ int main(int argk, char *argv[]) {
 
     for (int i = 0; i < n; i++) {
         printf("%d\n", 2 * i);
-        sleep(1);  // Sleep for 5 sec
+        sleep(5);  // Sleep for 5 sec
     }
 
     return 0;

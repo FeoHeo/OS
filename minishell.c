@@ -27,7 +27,7 @@ char            line[NL];	/* command input buffer */
 
 prompt(void)
 {
-  fprintf(stdout, "\n msh> ");
+  //fprintf(stdout, "\n msh> "); //submission purpose
   fflush(stdout);
 
 }
@@ -55,8 +55,8 @@ main(int argk, char *argv[], char *envp[])
 
     if (feof(stdin)) {		/* non-zero on EOF  */
 
-      fprintf(stderr, "EOF pid %d feof %d ferror %d\n", getpid(),
-	      feof(stdin), ferror(stdin));
+      // fprintf(stderr, "EOF pid %d feof %d ferror %d\n", getpid(),
+	    //   feof(stdin), ferror(stdin)); //submission purposes
       exit(0);
     }
     if (line[0] == '#' || line[0] == '\n' || line[0] == '\000')
@@ -90,7 +90,7 @@ main(int argk, char *argv[], char *envp[])
     if(getcwd(currentDir , sizeof(currentDir)) == NULL) {
         perror("getcwd() error");
     } else {
-        printf("Currnet directory is: %s\n", currentDir);
+        //printf("Currnet directory is: %s\n", currentDir);
     };
 
 
@@ -113,7 +113,7 @@ main(int argk, char *argv[], char *envp[])
     default:			/* code executed only by parent process */
         {
       //wpid = wait(0);
-    printf("%s background done \n", v[0]);
+    //printf("%s background done \n", v[0]); //submission purposes
     break;
         }
     }				/* switch */
@@ -122,7 +122,7 @@ main(int argk, char *argv[], char *envp[])
     if(execvp(v[0], v)){ 
       perror("execvp failed");
     };
-    printf("%s done \n", v[0]);
+    //printf("%s done \n", v[0]); //submission purposes
     continue;
   }       //inBack
     
