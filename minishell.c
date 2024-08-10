@@ -25,7 +25,7 @@ char            line[NL];	/* command input buffer */
 	shell prompt
  */
 
-prompt(void)
+void prompt(void)
 {
   //fprintf(stdout, "\n msh> "); //submission purpose
   fflush(stdout);
@@ -33,14 +33,14 @@ prompt(void)
 }
 
 
-main(int argk, char *argv[], char *envp[])
+void main(int argk, char *argv[], char *envp[])
 /* argk - number of arguments */
 /* argv - argument vector from command line */
 /* envp - environment pointer */
 
 {
   int             frkRtnVal;	/* value returned by fork sys call */
-  int             wpid;		/* value returned by wait */
+  //int             wpid;		/* value returned by wait */
   char           *v[NV];	/* array of pointers to command line tokens */
   char           *sep = " \t\n";/* command line token separators    */
   int             i;		/* parse index */
@@ -73,13 +73,13 @@ main(int argk, char *argv[], char *envp[])
     for(int i=0 ; i<NL ; i++) {
       if(line[i] == '&') {
         inBack = 1;
-        line[i] = NULL;
+        //line[i] = NULL;
       }
     }
       
   if(!strcmp(v[0] , "cd")) {
     char currentDir[256];
-    char dir[20];
+    //char dir[20];
 
 
 
