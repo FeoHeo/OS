@@ -40,11 +40,12 @@ int main(int argk, char *argv[], char *envp[])
 
 {
   int             frkRtnVal;	/* value returned by fork sys call */
-  //int             wpid;		/* value returned by wait */
+  int             wpid;		/* value returned by wait */
   char           *v[NV];	/* array of pointers to command line tokens */
   char           *sep = " \t\n";/* command line token separators    */
   int             i;		/* parse index */
   int inBack = 0; //Check for background
+  int bgCount = 0;
 
   /* prompt for and process one command line at a time  */
 
@@ -52,6 +53,8 @@ int main(int argk, char *argv[], char *envp[])
     prompt();
     fgets(line, NL, stdin);
     fflush(stdin);
+
+    inBack = 0; //Reset bg state
 
     if (feof(stdin)) {		/* non-zero on EOF  */
 
@@ -76,7 +79,6 @@ int main(int argk, char *argv[], char *envp[])
         //line[i] = NULL;
       }
     }
-      
   if(!strcmp(v[0] , "cd")) {
     char currentDir[256];
     //char dir[20];
@@ -96,21 +98,25 @@ int main(int argk, char *argv[], char *envp[])
 
   } else if(inBack == 1) {
       /* fork a child process to exec the command in v[0] */
+    bgCount++;
     switch (frkRtnVal = fork()) {
     case -1:			/* fork returns error to parent process */
         {
-    perror("Fork failed");
+      perror("Fork failed");
     break;
         }
-      case 0:			/* code executed only by child process */
+    case 0:			/* code executed only by child process */
         {
-    if(execvp(v[0], v)) {
-      perror("execvp from background failed");
-    }; // Can run an executable file
-    kill(getppid() , SIGTERM);
-    continue;
+      if(execvp(v[0], v)) {
+        perror("execvp from background failed");
+      }; // Can run an executable file
+      //kill(getppid() , SIGTERM);
+      break;
         }
     default:			/* code executed only by parent process */
+      printf("[%d] %d\n", bgCount , getpid());
+      wpid = wait(0);
+      printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
         {
       //wpid = wait(0);
     //printf("%s background done \n", v[0]); //submission purposes
@@ -119,11 +125,24 @@ int main(int argk, char *argv[], char *envp[])
     }				/* switch */
 
   } else { //Default case will execute the command
-    if(execvp(v[0], v)){ 
-      perror("execvp failed");
-    };
+    switch (fork())
+    {
+    case -1:
+      perror("Fork for main process failed");
+      break;
+    
+    case 0:
+      if(execvp(v[0], v)){ 
+        perror("execvp failed");
+      };
+      break;
+
+    default:
+      continue;
+    }
+
     //printf("%s done \n", v[0]); //submission purposes
-    continue;
+    break;
   }       //inBack
     
   }				/* while */
