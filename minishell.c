@@ -33,7 +33,7 @@ void prompt(void)
 }
 
 
-void main(int argk, char *argv[], char *envp[])
+int main(int argk, char *argv[], char *envp[])
 /* argk - number of arguments */
 /* argv - argument vector from command line */
 /* envp - environment pointer */
@@ -127,4 +127,5 @@ void main(int argk, char *argv[], char *envp[])
   }       //inBack
     
   }				/* while */
+  return 0;
 }				/* main */
