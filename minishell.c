@@ -99,6 +99,7 @@ int main(int argk, char *argv[], char *envp[])
   } else if(inBack == 1) {
       /* fork a child process to exec the command in v[0] */
     bgCount++;
+    v[2] = NULL;
     switch (frkRtnVal = fork()) {
     case -1:			/* fork returns error to parent process */
         {
@@ -110,14 +111,15 @@ int main(int argk, char *argv[], char *envp[])
       if(execvp(v[0], v)) {
         perror("execvp from background failed");
       }; // Can run an executable file
-      //kill(getppid() , SIGTERM);
       break;
         }
     default:			/* code executed only by parent process */
-      printf("[%d] %d\n", bgCount , getpid());
-      wait(0);
-      printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
         {
+      printf("[%d] %d\n", bgCount , getpid());
+      int pid = getpid();
+      wait(&pid);
+      printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
+      //kill(getpid() , SIGTERM);
       //wpid = wait(0);
     //printf("%s background done \n", v[0]); //submission purposes
     break;
