@@ -108,6 +108,7 @@ int main(int argk, char *argv[], char *envp[])
         }
     case 0:			/* code executed only by child process */
         {
+      printf("[%d] %d\n", bgCount , getpid());
       if(execvp(v[0], v)) {
         perror("execvp from background failed");
       }; // Can run an executable file
@@ -115,9 +116,8 @@ int main(int argk, char *argv[], char *envp[])
         }
     default:			/* code executed only by parent process */
         {
-      printf("[%d] %d\n", bgCount , getpid());
-      int pid = getpid();
-      wait(&pid);
+      // int pid = getpid();
+      // wait(&pid);
       printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
       //kill(getpid() , SIGTERM);
       //wpid = wait(0);
