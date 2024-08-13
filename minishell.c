@@ -117,7 +117,7 @@ int main(int argk, char *argv[], char *envp[])
         {
       printf("[%d] %d\n", bgCount , getpid());
       int pid = getpid();
-      //wait(&pid);
+      wait(&pid);
       printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
       //kill(getpid() , SIGTERM);
       //wpid = wait(0);
