@@ -147,8 +147,6 @@ int main(int argk, char *argv[], char *envp[])
         }
     case 0:			/* code executed only by child process */
         {
-      int pid = getpid();
-      printf("[%d] %d\n", bgCount , pid);
       if(execvp(v[0], v)) {
         perror("execvp from background failed");
       };
@@ -157,6 +155,8 @@ int main(int argk, char *argv[], char *envp[])
         }
     default:			/* code executed only by parent process */
         {
+      int pid = getpid();
+      printf("[%d] %d\n", bgCount , pid);
       backTasks[bgCount - 1].bgPid = getpid();
       backTasks[bgCount - 1].chPid = frkRtnVal;
       strcat(backTasks[bgCount - 1].bgCmd , v[0]);
