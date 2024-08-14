@@ -18,15 +18,33 @@
 
 #define NV 20			/* max number of command tokens */
 #define NL 100			/* input buffer size */
+struct bgTask
+{
+  int bgPid;
+  int chPid;
+  char bgCmd[50];
+};
+
 char            line[NL];	/* command input buffer */
-char           *v[NV];	/* array of pointers to command line tokens */
 int bgCount = 0;
+struct bgTask   backTasks[50];
 
 
-void sigchld_handler(int sig) {
-  printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
+
+void sigchld_handler(int signum)
+{
+    pid_t pid;
+    int   status;
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+    {
+      // printf("Terminated with pid %d\n" , backTasks[bgCount-1].bgPid); //Testing purpose
+      for(int i=0 ; i<bgCount ; i++) {
+        if(pid == backTasks[i].chPid) {
+          printf("[%d]+ Done %s\n", i+1 , backTasks[i].bgCmd);
+        };
+      };
+    }
 }
-
 /*
 	shell prompt
  */
@@ -48,6 +66,7 @@ int main(int argk, char *argv[], char *envp[])
 {
   int             frkRtnVal;	/* value returned by fork sys call */
   //int             wpid;		/* value returned by wait */
+  char           *v[NV];	/* array of pointers to command line tokens */
   char           *sep = " \t\n";/* command line token separators    */
   int             i;		/* parse index */
   int inBack = 0; //Check for background
@@ -55,7 +74,13 @@ int main(int argk, char *argv[], char *envp[])
   /* prompt for and process one command line at a time  */
 
   
-  signal(SIGCHLD , sigchld_handler);
+  struct sigaction sa;
+  sa.sa_handler = sigchld_handler;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+  sigaction(SIGCHLD, &sa, NULL);
+
+  //signal(SIGCHLD , sigchld_handler);
   while (1) {			/* do Forever */
     prompt();
     fgets(line, NL, stdin);
@@ -122,7 +147,8 @@ int main(int argk, char *argv[], char *envp[])
         }
     case 0:			/* code executed only by child process */
         {
-      printf("[%d] %d\n", bgCount , getpid());
+      int pid = getpid();
+      printf("[%d] %d\n", bgCount , pid);
       if(execvp(v[0], v)) {
         perror("execvp from background failed");
       };
@@ -131,6 +157,11 @@ int main(int argk, char *argv[], char *envp[])
         }
     default:			/* code executed only by parent process */
         {
+      backTasks[bgCount - 1].bgPid = getpid();
+      backTasks[bgCount - 1].chPid = frkRtnVal;
+      strcat(backTasks[bgCount - 1].bgCmd , v[0]);
+      strcat(backTasks[bgCount - 1].bgCmd , " ");
+      strcat(backTasks[bgCount - 1].bgCmd , v[1]);
       //kill(getpid() , SIGTERM);
       //wpid = wait(0);
     break;
