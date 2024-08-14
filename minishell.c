@@ -19,7 +19,13 @@
 #define NV 20			/* max number of command tokens */
 #define NL 100			/* input buffer size */
 char            line[NL];	/* command input buffer */
+char           *v[NV];	/* array of pointers to command line tokens */
+int bgCount = 0;
 
+
+void sigchld_handler(int sig) {
+  printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
+}
 
 /*
 	shell prompt
@@ -33,6 +39,7 @@ void prompt(void)
 }
 
 
+
 int main(int argk, char *argv[], char *envp[])
 /* argk - number of arguments */
 /* argv - argument vector from command line */
@@ -41,14 +48,14 @@ int main(int argk, char *argv[], char *envp[])
 {
   int             frkRtnVal;	/* value returned by fork sys call */
   //int             wpid;		/* value returned by wait */
-  char           *v[NV];	/* array of pointers to command line tokens */
   char           *sep = " \t\n";/* command line token separators    */
   int             i;		/* parse index */
   int inBack = 0; //Check for background
-  int bgCount = 0;
 
   /* prompt for and process one command line at a time  */
 
+  
+  signal(SIGCHLD , sigchld_handler);
   while (1) {			/* do Forever */
     prompt();
     fgets(line, NL, stdin);
@@ -80,20 +87,27 @@ int main(int argk, char *argv[], char *envp[])
       }
     }
   if(!strcmp(v[0] , "cd")) {
-    char currentDir[256];
-    //char dir[20];
+    // char currentDir[256];
+    // //char dir[20];
 
 
 
-    if(chdir(v[1]) != 0) {
-      perror("cd failed");
+    // if(chdir(v[1]) != 0) {
+    //   perror("cd failed");
+    // }
+
+    // if(getcwd(currentDir , sizeof(currentDir)) == NULL) {
+    //     perror("getcwd() error");
+    // } else {
+    //     //printf("Currnet directory is: %s\n", currentDir);
+    // };
+    const char *dir = v[1] ? v[1] : getenv("HOME");
+    if (dir == NULL) {
+        fprintf(stderr, "cd: HOME not set\n");
+    } else if (chdir(dir) != 0) {
+        perror("error from cd");
     }
-
-    if(getcwd(currentDir , sizeof(currentDir)) == NULL) {
-        perror("getcwd() error");
-    } else {
-        //printf("Currnet directory is: %s\n", currentDir);
-    };
+    continue; // Move to next command
 
 
   } else if(inBack == 1) {
@@ -111,17 +125,14 @@ int main(int argk, char *argv[], char *envp[])
       printf("[%d] %d\n", bgCount , getpid());
       if(execvp(v[0], v)) {
         perror("execvp from background failed");
-      }; // Can run an executable file
+      };
+        // Can run an executable file
       break;
         }
     default:			/* code executed only by parent process */
         {
-      // int pid = getpid();
-      // wait(&pid);
-      printf("[%d]+ Done %s %s\n", bgCount , v[0] , v[1]);
       //kill(getpid() , SIGTERM);
       //wpid = wait(0);
-    //printf("%s background done \n", v[0]); //submission purposes
     break;
         }
     }				/* switch */
