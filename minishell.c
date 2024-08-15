@@ -69,7 +69,7 @@ int main(int argk, char *argv[], char *envp[])
   char           *v[NV];	/* array of pointers to command line tokens */
   char           *sep = " \t\n";/* command line token separators    */
   int             i;		/* parse index */
-  int inBack = 0; //Check for background
+  //int inBack = 0; //Check for background
 
   /* prompt for and process one command line at a time  */
 
