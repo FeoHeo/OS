@@ -86,7 +86,7 @@ int main(int argk, char *argv[], char *envp[])
     fgets(line, NL, stdin);
     //fflush(stdin);
 
-    inBack = 0; //Reset bg state
+    //inBack = 0; //Reset bg state
 
     if (feof(stdin)) {		/* non-zero on EOF  */
 
