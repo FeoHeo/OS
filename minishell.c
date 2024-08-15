@@ -26,8 +26,8 @@ struct bgTask
 };
 
 char            line[NL];	/* command input buffer */
-int bgCount = 0;
 struct bgTask   backTasks[50];
+int bgCount = 0;
 
 
 
@@ -84,7 +84,7 @@ int main(int argk, char *argv[], char *envp[])
   while (1) {			/* do Forever */
     prompt();
     fgets(line, NL, stdin);
-    fflush(stdin);
+    //fflush(stdin);
 
     inBack = 0; //Reset bg state
 
@@ -135,7 +135,7 @@ int main(int argk, char *argv[], char *envp[])
     continue; // Move to next command
 
 
-  } else if(inBack == 1) {
+  } else if(v[2] != NULL) {
       /* fork a child process to exec the command in v[0] */
     bgCount++;
     v[2] = NULL;
@@ -155,8 +155,7 @@ int main(int argk, char *argv[], char *envp[])
         }
     default:			/* code executed only by parent process */
         {
-      int pid = getpid();
-      printf("[%d] %d\n", bgCount , pid);
+      printf("[%d] %d\n", bgCount , getpid());
       backTasks[bgCount - 1].bgPid = getpid();
       backTasks[bgCount - 1].chPid = frkRtnVal;
       strcat(backTasks[bgCount - 1].bgCmd , v[0]);
